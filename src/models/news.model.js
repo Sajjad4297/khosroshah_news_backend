@@ -170,22 +170,29 @@ const readNewsById = async (newsId) => {
             WHERE n.id = ?
             GROUP BY n.id
         `;
-        await db.execute('UPDATE news SET visits = visits + 1 WHERE id = ?', [newsId]);
         const [result] = await db.execute(sql, [newsId]);
+        if (!result || result.length === 0 || !result[0] || !result[0].id) {
+            return null;
+        }
+
+        await db.execute('UPDATE news SET visits = visits + 1 WHERE id = ?', [newsId]);
+
+        const parseGroupConcat = (field) => {
+            if (!field) return [];
+            return field.split(',').map(item => {
+                const parts = item.split(':');
+                const id = parseInt(parts[0], 10);
+                const name = parts[1] || '';
+                const title = parts.slice(2).join(':') || '';
+                return { id: isNaN(id) ? null : id, name, title };
+            }).filter(item => item.id !== null);
+        };
+
         const news = {
             ...result[0],
-            tags: result[0].tags ? result[0].tags.split(',').map(tag => {
-                const [id, name, title] = tag.split(':');
-                return { id: parseInt(id, 10), name, title };
-            }) : [],
-            topics: result[0].topics ? result[0].topics.split(',').map(topic => {
-                const [id, name, title] = topic.split(':');
-                return { id: parseInt(id, 10), name, title };
-            }) : [],
-            subTopics: result[0].subTopics ? result[0].subTopics.split(',').map(subTopic => {
-                const [id, name, title] = subTopic.split(':');
-                return { id: parseInt(id, 10), name, title };
-            }) : [],
+            tags: parseGroupConcat(result[0].tags),
+            topics: parseGroupConcat(result[0].topics),
+            subTopics: parseGroupConcat(result[0].subTopics),
         };
         return news;
 
@@ -302,17 +309,17 @@ const readNewsByTag = async (slug) => {
 };
 const deleteNewsById = async (id) => {
     try {
-        await db.execute(
+        await db.execute('DELETE FROM news_to_tags WHERE news_id = ?', [id]);
+        await db.execute('DELETE FROM news_to_topics WHERE news_id = ?', [id]);
+        await db.execute('DELETE FROM news_to_sub_topics WHERE news_id = ?', [id]);
+        const [result] = await db.execute(
             'DELETE FROM news WHERE id = ?',
             [id]
         );
-
-
-
+        return result.affectedRows > 0;
     } catch (error) {
         throw error;
     }
-
 }
 module.exports = {
     createNews,

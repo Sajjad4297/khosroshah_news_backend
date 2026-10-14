@@ -34,7 +34,9 @@ DB_HOST=localhost
 DB_USER=your_db_user
 DB_PASS=your_db_password
 DB_NAME=your_db_name
-JWT_SECRET=your-secret-key
+JWT_SECRET=your_long_random_jwt_secret_key
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_strong_admin_password
 NODE_ENV=development
 ```
 
@@ -60,13 +62,13 @@ Server starts on port `5000`.
 
 | Method | Endpoint                    | Description              | Auth |
 |--------|-----------------------------|--------------------------|------|
-| POST   | `/api/news`                 | Create news (with image) | No   |
+| POST   | `/api/news`                 | Create news (with image) | Yes  |
 | GET    | `/api/news/all`             | Get all news             | No   |
 | GET    | `/api/news/:id`             | Get news by ID           | No   |
 | GET    | `/api/news/byTopic/:slug`   | Get news by topic slug   | No   |
 | GET    | `/api/news/bySubTopic/:slug`| Get news by subtopic slug| No   |
 | GET    | `/api/news/byTag/:slug`     | Get news by tag slug     | No   |
-| DELETE | `/api/news/:id`             | Delete news              | No   |
+| DELETE | `/api/news/:id`             | Delete news              | Yes  |
 
 ### News Overview
 
@@ -77,10 +79,10 @@ Server starts on port `5000`.
 
 ### Tags
 
-| Method | Endpoint      | Description |
-|--------|---------------|-------------|
-| POST   | `/api/tags`   | Create tag  |
-| GET    | `/api/tags`   | Get all tags|
+| Method | Endpoint      | Description | Auth |
+|--------|---------------|-------------|------|
+| POST   | `/api/tags`   | Create tag  | Yes  |
+| GET    | `/api/tags`   | Get all tags| No   |
 
 ### Topics
 

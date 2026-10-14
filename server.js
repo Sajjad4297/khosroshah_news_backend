@@ -1,21 +1,21 @@
 // server.js
-const app = require('./src/app');
 const dotenv = require('dotenv');
 
-// Load env variables
+// Load environment variables before loading any application modules
 dotenv.config();
 
-// Setup Prisma
+const app = require('./src/app');
 
-// Connect to database
-async function startServer() {
+function startServer() {
   try {
-    //await prisma.$connect();
+    const PORT = process.env.PORT || 5000;
+    const HOST = process.env.HOST || '0.0.0.0';
 
-    const PORT = 5000 ;
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
+      console.log(`Server listening on ${HOST}:${PORT}`);
     });
   } catch (err) {
+    console.error('Failed to start server:', err);
     process.exit(1);
   }
 }
